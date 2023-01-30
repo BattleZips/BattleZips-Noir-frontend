@@ -77,4 +77,3 @@ yarn start
 ---
 npm start
 ```
-# BattleZips-Noir-frontend
