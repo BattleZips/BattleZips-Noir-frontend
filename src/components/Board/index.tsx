@@ -18,7 +18,7 @@ const useStyles = createUseStyles({
     fontWeight: 700,
     justifyContent: 'center',
     lineHeight: '34.68px',
-    width: '46px'
+    width: '46px',
   },
   leave: {
     backgroundColor: '#FF0055',
@@ -30,20 +30,20 @@ const useStyles = createUseStyles({
     letterSpacing: '3.6px',
     margin: '46px auto 0 auto',
     padding: '5px 15px',
-    width: 'fit-content'
+    width: 'fit-content',
   },
   rotateText: {
     fontSize: '24px',
     fontWeight: 400,
     letterSpacing: '3.6px',
     margin: '55px auto 0 auto',
-    width: 'fit-content'
+    width: 'fit-content',
   },
   row: {
     alignItems: 'center',
     display: 'flex',
     gap: '7px',
-    marginTop: '7px'
+    marginTop: '7px',
   },
   ship: {
     left: 0,
@@ -53,8 +53,8 @@ const useStyles = createUseStyles({
     transition: '.2s transform',
     zIndex: 1,
     '& > circle': {
-      fill: '#FFFFFF'
-    }
+      fill: '#FFFFFF',
+    },
   },
   tile: {
     alignItems: 'center',
@@ -65,11 +65,11 @@ const useStyles = createUseStyles({
     justifyContent: 'center',
     height: '46px',
     position: 'relative',
-    width: '46px'
+    width: '46px',
   },
   wrapper: {
-    marginTop: '24px'
-  }
+    marginTop: '24px',
+  },
 });
 
 // Board is simply a 10x10 array
@@ -94,7 +94,7 @@ export default function Board({
   rotationAxis,
   selectedShip,
   setPlacedShip,
-  status
+  status,
 }: BoardProps): JSX.Element {
   const styles = useStyles();
   // Sections above which a seleted ship is being rendered before placement
@@ -172,31 +172,31 @@ export default function Board({
     const hits: any = ship.sections.map((section, index) => [
       section,
       opponentShots.find((shot) => shot.x + shot.y * 10 === section),
-      index + 1
+      index + 1,
     ]);
     const defaultClass = {
       '& > circle': {
-        fill: '#FFFFFF'
-      }
+        fill: '#FFFFFF',
+      },
     };
     const pseudoClasses = hits
       .filter((hit: any) => hit[1])
       .map((hit: any) => ({
         [`& > circle:nth-of-type(${hit[2]})`]: {
-          fill: '#FF0055'
-        }
+          fill: '#FF0055',
+        },
       }));
     const obj = [defaultClass].concat(pseudoClasses).reduce(
       (obj, item) => ({
         ...obj,
-        [Object.keys(item)[0]]: Object.values(item)[0]
+        [Object.keys(item)[0]]: Object.values(item)[0],
       }),
       {}
     );
     const sheet = jss
       .createStyleSheet(
         {
-          circle: obj
+          circle: obj,
         },
         { link: true }
       )
@@ -212,7 +212,6 @@ export default function Board({
    * @param {number} row - index of the row being hovered over
    */
   const handleHover = (index: number, row: number) => {
-    console.log('Index: ', index);
     const sections = calculateSections(index, row);
     if (rotationAxis === 'y') {
       setHighlightedSections(sections.filter((section) => section < 100));
@@ -238,7 +237,7 @@ export default function Board({
     setPlacedShip({
       ...selectedShip,
       orientation: rotationAxis,
-      sections
+      sections,
     } as Ship);
     setHighlightedSections([]);
   };
@@ -359,7 +358,7 @@ export default function Board({
                                   SHIP_STYLES[occupied.name].translate
                                 }px)`
                               : 'rotate(0deg)',
-                          width: calculateShipWidth(occupied.length)
+                          width: calculateShipWidth(occupied.length),
                         }}
                       />
                     )}
@@ -375,7 +374,7 @@ export default function Board({
                               }px)`
                             : 'rotate(0deg)',
                           width: calculateShipWidth(highlightedSections.length),
-                          zIndex: 2
+                          zIndex: 2,
                         }}
                       />
                     )}

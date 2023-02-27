@@ -16,7 +16,7 @@ import { Shot } from './types';
 import { toast } from 'react-hot-toast';
 import GameOver from './components/GameOver';
 import { createShipHash, delay } from 'utils';
-import { generateProof } from 'zk/noir_tools';
+import { createProof } from 'zk/noir_tools';
 import { GameStatus } from 'web3/constants';
 
 const useStyles = createUseStyles({
@@ -24,11 +24,11 @@ const useStyles = createUseStyles({
     display: 'flex',
     gap: '114px',
     marginInline: 'auto',
-    width: 'fit-content'
+    width: 'fit-content',
   },
   eth: {
     height: '28px',
-    width: '28px'
+    width: '28px',
   },
   fleetLabel: {
     alignItems: 'center',
@@ -40,7 +40,7 @@ const useStyles = createUseStyles({
     gap: '16px',
     justifyContent: 'center',
     lineHeight: '34.68px',
-    paddingBlock: '2px'
+    paddingBlock: '2px',
   },
   waitingForOpponent: {
     alignItems: 'center',
@@ -49,8 +49,8 @@ const useStyles = createUseStyles({
     fontWeight: 700,
     height: '523px',
     justifyContent: 'center',
-    lineHeight: '34.68px'
-  }
+    lineHeight: '34.68px',
+  },
 });
 
 export default function Game(): JSX.Element {
@@ -105,7 +105,7 @@ export default function Game(): JSX.Element {
     board: number[][],
     shot: number[],
     hit: boolean
-  ): Promise<{ hash: string; proof: Buffer }> => {
+  ): Promise<{ hash: string; proof: Uint8Array }> => {
     // Generate Pedersen hash of ships on board
     const _shipHash = await createShipHash(board);
     const abi = {
@@ -113,10 +113,10 @@ export default function Game(): JSX.Element {
       hit: hit ? 1 : 0,
       // Flatten board to 1D array
       ships: board.flat(),
-      shot
+      shot,
     };
     // Generate shot proof
-    const proof = await generateProof('shot', abi);
+    const proof = await createProof('shot', abi);
     // TODO: Add in window verification
     return { hash: _shipHash, proof };
   };
@@ -176,7 +176,7 @@ export default function Game(): JSX.Element {
           hit: shot.hit,
           turn: +shot.turn,
           x: +shot.x,
-          y: +shot.y
+          y: +shot.y,
         }));
       const oddShots = game.shots
         .filter((_shot: Shot, index: number) => index % 2 === 1)
@@ -184,7 +184,7 @@ export default function Game(): JSX.Element {
           hit: shot.hit,
           turn: +shot.turn,
           x: +shot.x,
-          y: +shot.y
+          y: +shot.y,
         }));
       // If game was started by logged in user then even shots are theirs, else opponents
       if (game.startedBy === address) {
@@ -232,14 +232,14 @@ export default function Game(): JSX.Element {
             provider,
             biconomy,
             functionName: 'firstTurn',
-            args: params
+            args: params,
           };
           await metatransaction(metatx);
         } else {
           const tx: ITx = {
             provider,
             functionName: 'firstTurn',
-            args: params
+            args: params,
           };
           await transaction(tx);
         }
@@ -258,14 +258,14 @@ export default function Game(): JSX.Element {
             provider,
             biconomy,
             functionName: 'turn',
-            args: params
+            args: params,
           };
           await metatransaction(metatx);
         } else {
           const tx: ITx = {
             provider,
             functionName: 'turn',
-            args: params
+            args: params,
           };
           await transaction(tx);
         }
@@ -358,7 +358,7 @@ export default function Game(): JSX.Element {
               >
                 OPPONENT
                 {!yourTurn && (
-                  <img alt="Eth" className={styles.eth} src={eth} />
+                  <img alt='Eth' className={styles.eth} src={eth} />
                 )}
               </div>
               {showOpponentBoard ? (
@@ -380,7 +380,7 @@ export default function Game(): JSX.Element {
                 style={{ background: '#FF0055' }}
               >
                 YOUR FLEET
-                {yourTurn && <img alt="Eth" className={styles.eth} src={eth} />}
+                {yourTurn && <img alt='Eth' className={styles.eth} src={eth} />}
               </div>
               <Board
                 allPlaced={true}
