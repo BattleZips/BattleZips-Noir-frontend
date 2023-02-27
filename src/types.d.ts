@@ -1,3 +1,4 @@
+declare module '@noir-lang/barretenberg';
 declare module 'fake-tag' {
   function gql(
     literals: TemplateStringsArray,

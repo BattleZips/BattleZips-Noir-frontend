@@ -16,7 +16,7 @@ import { toast } from 'react-hot-toast';
 import { BigNumber as BN } from 'ethers';
 import { IMetaTx, metatransaction } from 'web3/erc2771';
 import { createShipHash } from 'utils';
-import { generateProof } from 'zk/noir_tools';
+import { createProof } from 'zk/noir_tools';
 import { ActiveGameLocation } from 'Locations';
 
 const useStyles = createUseStyles({
@@ -24,7 +24,7 @@ const useStyles = createUseStyles({
     display: 'flex',
     gap: '114px',
     marginInline: 'auto',
-    width: 'fit-content'
+    width: 'fit-content',
   },
   fleetLabel: {
     borderRadius: '3px',
@@ -33,11 +33,11 @@ const useStyles = createUseStyles({
     fontWeight: 700,
     lineHeight: '34.68px',
     paddingBlock: '2px',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   wrapper: {
-    outline: 'none'
-  }
+    outline: 'none',
+  },
 });
 
 const SHIPS: Ship[] = [
@@ -45,32 +45,32 @@ const SHIPS: Ship[] = [
     image: carrier,
     name: 'carrier',
     length: 5,
-    sections: []
+    sections: [],
   },
   {
     image: battleship,
     name: 'battleship',
     length: 4,
-    sections: []
+    sections: [],
   },
   {
     image: cruiser,
     name: 'cruiser',
     length: 3,
-    sections: []
+    sections: [],
   },
   {
     image: submarine,
     name: 'submarine',
     length: 3,
-    sections: []
+    sections: [],
   },
   {
     image: destroyer,
     name: 'destroyer',
     length: 2,
-    sections: []
-  }
+    sections: [],
+  },
 ];
 
 /**
@@ -144,16 +144,16 @@ export default function BuildBoard(): JSX.Element {
    */
   const boardProof = async (
     board: number[][]
-  ): Promise<{ hash: string; proof: Buffer }> => {
+  ): Promise<{ hash: string; proof: Uint8Array }> => {
     // Generate Pedersen hash of ships on board
     const _shipHash = await createShipHash(board);
     const abi = {
       hash: _shipHash,
       // Convert to 1D array for Noir
-      ships: board.flat()
+      ships: board.flat(),
     };
-    const proof = await generateProof('board', abi);
-    // TODO: Add browser verification
+    // const proof = await generateProof('board', abi);
+    const proof = await createProof('board', abi);
     return { hash: _shipHash, proof };
   };
 
@@ -179,7 +179,7 @@ export default function BuildBoard(): JSX.Element {
       // If id exists then game is already created so attempt to join
       if (id) {
         toast.loading(`Attempting to join game ${id}...`, {
-          id: loadingToast
+          id: loadingToast,
         });
         const params = [+id, BN.from(hash), proof];
         // If biconomy is enabled then trigger meta transaction
@@ -188,14 +188,14 @@ export default function BuildBoard(): JSX.Element {
             provider,
             biconomy,
             functionName: 'joinGame',
-            args: params
+            args: params,
           };
           await metatransaction(metatx);
         } else {
           const tx: ITx = {
             provider,
             functionName: 'joinGame',
-            args: params
+            args: params,
           };
           await transaction(tx);
         }
@@ -221,14 +221,14 @@ export default function BuildBoard(): JSX.Element {
             provider,
             biconomy,
             functionName: 'newGame',
-            args: params
+            args: params,
           };
           await metatransaction(metatx);
         } else {
           const tx: ITx = {
             provider,
             functionName: 'newGame',
-            args: params
+            args: params,
           };
           await transaction(tx);
         }
@@ -240,7 +240,7 @@ export default function BuildBoard(): JSX.Element {
         );
         toast.success('Game successfully created.', {
           duration: 5000,
-          id: loadingToast
+          id: loadingToast,
         });
         navigate(ActiveGameLocation(`${+currentIndex + 1}`));
       }
@@ -248,7 +248,7 @@ export default function BuildBoard(): JSX.Element {
       console.log('ERROR: ', err);
       toast.error(id ? 'Error joining game' : 'Error creating game', {
         id: loadingToast,
-        duration: 5000
+        duration: 5000,
       });
     }
   };

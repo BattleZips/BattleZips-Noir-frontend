@@ -1,22 +1,9 @@
-import initNoirWasm, { acir_from_bytes } from "@noir-lang/noir_wasm";
-import setup_generic_prover from "./setup_generic_prover";
-
-// Circuit sizes must be known on frontend for valid proof generation
-const CIRCUIT_SIZES = {
-    board: 8192,
-    shot: 4096
-}
+import initNoirWasm, { acir_read_bytes } from "@noir-lang/noir_wasm";
 
 // Map specific proof to relevant files
 const PROOF_TO_FILES = {
-    board: {
-        acir: 'boardAcir.buf',
-        circuit: 'boardCircuit.buf'
-    },
-    shot: {
-        acir: 'shotAcir.buf',
-        circuit: 'shotCircuit.buf'
-    }
+    board: 'boardAcir.buf',
+    shot: 'shotAcir.buf',
 }
 
 export type BoardABI = {
@@ -41,22 +28,17 @@ type Proof = 'board' | 'shot'
  * @param {BoardABI | ShotABI} input - ABI corresponding to specific proof 
  * @returns {Buffer} - Noir proof
  */
-export const generateProof = async (proofType: Proof, input: BoardABI | ShotABI) => {
-    // Initialize Noir web assembly
+export const createProof = async (proofType: Proof, input: BoardABI | ShotABI): Promise<Uint8Array> => {
+    // Initialize Noir WebAssembly
     await initNoirWasm();
-    // Arbitrary files must be read into react file via fetch
-    let response = await fetch(PROOF_TO_FILES[proofType].circuit);
-    let buffer = await response.arrayBuffer();
-    const circuit = new Uint8Array(buffer);
-
-    response = await fetch(PROOF_TO_FILES[proofType].acir);
-    buffer = await response.arrayBuffer();
+    // Fetch acir representation of circuit from buffer
+    const res = await fetch(PROOF_TO_FILES[proofType]);
+    const buffer = await res.arrayBuffer();
     const bytes = new Uint8Array(buffer);
-    const acir = acir_from_bytes(bytes);
-    // Use custom function set up proof in React app. Must pass in circuit size
-    const [prover] = await setup_generic_prover(circuit, CIRCUIT_SIZES[proofType]);
+    // Convert bytes to acir
+    const acir = acir_read_bytes(bytes);
+    // Initialize web worker
     const worker = new Worker(new URL('./aztecWorker.js', import.meta.url));
-    // Fetch error promise if worker fails
     const errorPromise = new Promise((_resolve, reject) => {
         worker.onerror = (e) => {
             reject(e);
@@ -69,9 +51,7 @@ export const generateProof = async (proofType: Proof, input: BoardABI | ShotABI)
         }
     });
     // Pass in acir and abi to webworker to generate witness
-    worker.postMessage({ url: document.URL, acir, input });
-    const witness: any = await Promise.race([errorPromise, resultPromise]);
-    // Pass witness in and create prover
-    const proof = await prover.createProof(witness);
-    return proof;
+    worker.postMessage({ acir, input });
+    const proof = await Promise.race([errorPromise, resultPromise]);
+    return proof as Uint8Array;
 }

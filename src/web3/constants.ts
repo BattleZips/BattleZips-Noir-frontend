@@ -122,6 +122,6 @@ export const NETWORK_NAMES: StringInfo = {
 export const SUPPORTED_NETWORKS: number[] = [5, 137, 1337, 31337, 80001];
 
 // Right now only supported network for BattleZips noir is goerli. Easy to change though
-export const DEFAULT_NETWORK = SUPPORTED_NETWORKS[0];
+export const DEFAULT_NETWORK = SUPPORTED_NETWORKS[4];
 // BattleshipGame abi
 export const ABI = abi;
