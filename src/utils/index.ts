@@ -1,5 +1,4 @@
-import { SinglePedersen } from '@noir-lang/barretenberg/dest/crypto';
-import { BarretenbergWasm } from '@noir-lang/barretenberg';
+import { BarretenbergWasm, SinglePedersen } from '@noir-lang/barretenberg';
 
 /**
  * Function to compute the Pedersen hash of the BattleShip board
